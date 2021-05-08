@@ -25,8 +25,8 @@ android {
         applicationId "com.karlsj.communitypantryfinder"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 10
-        versionName "10"
+        versionCode 13
+        versionName "3.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
@@ -42,10 +42,15 @@ android {
 
     buildTypes {
         release {
+            shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
             signingConfig signingConfigs.release
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
     }
 
@@ -90,10 +95,6 @@ dependencies {
     implementation 'com.google.dagger:hilt-android:2.35'
     kapt 'com.google.dagger:hilt-compiler:2.35'
 
-    // Google Play Services
-    implementation 'com.google.android.play:core:1.10.0'
-    implementation 'com.google.android.gms:play-services-location:18.0.0'
-
     // Jetpack Libraries
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -105,9 +106,6 @@ dependencies {
 
     // Logger
     implementation 'com.jakewharton.timber:timber:4.7.1'
-
-    // Google Maps
-    implementation 'com.google.android.gms:play-services-maps:17.0.1'
 
     // Mapbox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.6.1'

@@ -17,7 +17,7 @@ internal class MapboxMapsViewModel @Inject constructor(
 ) : ViewModel() {
 
     interface Callback {
-        fun onGetPantrySuccess(mapMarkers: List<Pantry>)
+        fun onGetPantrySuccess(pantries: List<Pantry>)
         fun onGetPantryError(message: String)
     }
 
