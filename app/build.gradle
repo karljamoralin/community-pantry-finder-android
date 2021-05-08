@@ -1,0 +1,129 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt' // Annotation processor
+    id 'dagger.hilt.android.plugin' // Dependency injection
+    id 'kotlin-parcelize' // Parcelable generator
+}
+
+apply from: './secret.gradle'
+
+android {
+
+    signingConfigs {
+        release {
+            storeFile file(signing.storeFile)
+            storePassword signing.storePassword
+            keyAlias signing.keyAlias
+            keyPassword signing.keyPassword
+        }
+    }
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.karlsj.communitypantryfinder"
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 10
+        versionName "10"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
+
+        map.each { key, value ->
+            resValue "string", key, value
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    // Needed to support deep multi-module dependency graphs
+    // Ref: https://dagger.dev/hilt/gradle-setup#classpath-aggregation
+    hilt {
+        enableExperimentalClasspathAggregation = true
+    }
+
+    lintOptions {
+        checkReleaseBuilds = false
+    }
+
+}
+
+dependencies {
+    // Module dependencies
+    implementation project(path: ':domain')
+    // Dependency graph is app -> domain <- repository <- remote
+    // Need to include remote module here for Dagger to build a complete dependency graph
+    implementation project(path: ':remote')
+
+    // Activity
+    implementation "androidx.activity:activity-ktx:1.2.3"
+
+    // Fragment
+    implementation "androidx.fragment:fragment-ktx:1.3.3"
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
+
+    // Dependency Injection
+    implementation 'com.google.dagger:hilt-android:2.35'
+    kapt 'com.google.dagger:hilt-compiler:2.35'
+
+    // Google Play Services
+    implementation 'com.google.android.play:core:1.10.0'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+
+    // Jetpack Libraries
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+
+    // Kotlin standard Library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // Logger
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // Google Maps
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+
+    // Mapbox
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.6.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v9:0.9.0'
+
+    // Permissions
+    implementation "com.github.permissions-dispatcher:permissionsdispatcher:4.8.0"
+    kapt "com.github.permissions-dispatcher:permissionsdispatcher-processor:4.8.0"
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+
+    // UI
+    implementation 'com.google.android.material:material:1.3.0'
+}
+
+kapt {
+    correctErrorTypes true
+}

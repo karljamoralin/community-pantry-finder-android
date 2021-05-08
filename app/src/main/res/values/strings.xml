@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Community Pantry Finder</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="location_access_rationale">Please grant location access if you like to see community pantries near you.</string>
+    <string name="current_location">Current location</string>
+    <string name="location_permission_not_granted">Location permission not granted</string>
+    <string name="street_address">Street address</string>
+    <string name="barangay">Barangay</string>
+    <string name="city">City</string>
+    <string name="province">Province</string>
+    <string name="available_supplies">Available supplies</string>
+    <string name="schedule">Schedule</string>
+    <string name="other_details">Other details</string>
+    <string name="region">Region</string>
+</resources>

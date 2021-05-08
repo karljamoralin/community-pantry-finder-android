@@ -1,0 +1,6 @@
+rootProject.name = "Community Pantry Finder"
+
+include ':app'
+include ':remote'
+include ':data'
+include ':domain'

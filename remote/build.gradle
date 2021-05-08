@@ -1,0 +1,67 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.30' // Serializer
+    id 'kotlin-kapt' // Annotation processor
+    id 'dagger.hilt.android.plugin' // Dependency Injection
+}
+
+apply from: './properties.gradle'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+        consumerProguardFiles "consumer-rules.pro", 'kotlinx-serialization.pro'
+        buildConfigField("String", "URL", "\"$url\"")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    // Module dependency
+    implementation project(path: ':data')
+
+    // Dependency Injection
+    implementation 'com.google.dagger:hilt-android:2.35'
+    kapt 'com.google.dagger:hilt-compiler:2.35'
+
+    // HTTP Client
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+    // JSON Serializer
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+
+    // Kotlin standard Library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // Logger
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+}
+
+kapt {
+    correctErrorTypes true
+}
