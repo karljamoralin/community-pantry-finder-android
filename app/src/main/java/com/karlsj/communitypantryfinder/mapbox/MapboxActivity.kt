@@ -1,24 +1,15 @@
 package com.karlsj.communitypantryfinder.mapbox
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import com.google.android.material.snackbar.Snackbar
 import com.karlsj.communitypantryfinder.R
 import com.karlsj.communitypantryfinder.databinding.ActivityMapboxBinding
 import com.karlsj.communitypantryfinder.mapbox.PantryDetailsBottomSheet.Companion.ARG_PANTRY
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
@@ -26,47 +17,19 @@ import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import dagger.hilt.android.AndroidEntryPoint
-import permissions.dispatcher.NeedsPermission
-import permissions.dispatcher.OnNeverAskAgain
-import permissions.dispatcher.RuntimePermissions
 import timber.log.Timber
 
 
 @AndroidEntryPoint
-@RuntimePermissions
 internal class MapboxActivity : AppCompatActivity(), MapboxMapsViewModel.Callback {
 
     private val binding by lazy {
         ActivityMapboxBinding.inflate(layoutInflater)
     }
 
-    private val snackbar by lazy {
-        Snackbar.make(
-            binding.root,
-            getString(R.string.location_permission_not_granted),
-            Snackbar.LENGTH_LONG
-        ).setAction(
-            "Show settings"
-        ) {
-            Intent(
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts(
-                    "package",
-                    packageName,
-                    null
-                )
-            ).let { intent ->
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            }
-        }
-    }
-
-    private val map: MutableMap<Symbol, Pantry> =
-        mutableMapOf()
-    private val viewModel: MapboxMapsViewModel by viewModels()
-
+    private val map: MutableMap<Symbol, Pantry> = mutableMapOf()
     private var mapView: MapView? = null
+    private val viewModel: MapboxMapsViewModel by viewModels()
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapStyle: Style
@@ -84,12 +47,6 @@ internal class MapboxActivity : AppCompatActivity(), MapboxMapsViewModel.Callbac
 
             getMapAsync { mapboxMap ->
                 this@MapboxActivity.mapboxMap = mapboxMap
-
-                binding.showLocation.apply {
-                    visibility = View.VISIBLE
-                    setOnClickListener { showLocationWithPermissionCheck() }
-                }
-
 
                 mapboxMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -112,7 +69,6 @@ internal class MapboxActivity : AppCompatActivity(), MapboxMapsViewModel.Callbac
                             null
                         )!!
                     )
-
 
                     symbolManager = SymbolManager(
                         this,
@@ -190,46 +146,6 @@ internal class MapboxActivity : AppCompatActivity(), MapboxMapsViewModel.Callbac
 
     override fun onGetPantryError(message: String) {
         Timber.e(message)
-    }
-
-    @SuppressLint("MissingPermission")
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun showLocation() {
-        mapboxMap.locationComponent.apply {
-            LocationComponentOptions
-                .builder(this@MapboxActivity)
-                .elevation(5f)
-                .accuracyAlpha(.6f)
-                .build()
-                .let { componentOptions ->
-                    LocationComponentActivationOptions.builder(
-                        this@MapboxActivity,
-                        mapStyle
-                    )
-                        .locationComponentOptions(componentOptions)
-                        .build()
-                }.let { activationOptions ->
-                    activateLocationComponent(activationOptions)
-                }
-
-            isLocationComponentEnabled = true
-        }
-    }
-
-    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun onLocationNeverAskAgain() {
-        if (!snackbar.isShown) {
-            snackbar.show()
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        onRequestPermissionsResult(requestCode, grantResults)
     }
 
     companion object {
